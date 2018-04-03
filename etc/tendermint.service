@@ -1,0 +1,22 @@
+# /lib/systemd/system/*
+
+[Unit]
+Description=tendermint
+After=bov.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+User=ubuntu
+Environment=TM_HOME=/home/ubuntu/.mycoind
+ExecStart=/usr/local/bin/tendermint node
+
+[Install]
+WantedBy=multi-user.target
+
+# mv /home/ubuntu/go/bin/bov /usr/local/bin/bov
+# mv /home/ubuntu/go/bin/tendermint /usr/local/bin/tendermint
+
+# systemctl enable bov
+# systemctl enable tendermint

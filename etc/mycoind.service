@@ -1,0 +1,12 @@
+[Unit]
+Description=mycoind
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+User=ubuntu
+ExecStart=/usr/local/bin/mycoind start
+
+[Install]
+WantedBy=multi-user.target
