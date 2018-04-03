@@ -18,15 +18,13 @@ variable "name" {
   default = "mycoind"
 }
 
-variable "vpc_id" {
-  description = "id of the vpc where resources are located"
-}
-
 variable "cidr_block" {
   description = "cidr block for entire vpc"
+  default = "10.42.0.0/16"
 }
 
 variable "key_id" {
   description = "ID of key pair for ssh login into web servers"
+  default = "terraform"
 }
 

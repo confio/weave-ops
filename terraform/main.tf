@@ -61,23 +61,33 @@ resource "aws_instance" "node" {
 
   subnet_id = "${aws_subnet.node.id}"
 
-  lifecycle {
-    create_before_destroy = true
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
+
+  # make sure everything is up and running...
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+
+  # i assume this runs without root permissions????
+  provisioner "file" {
+    source = "../bin"
+    destination = "/home/ubuntu/bin"
   }
 
   provisioner "file" {
-    source = "bin/"
-    dest = "/usr/local/bin"
-  }
-
-  provisioner "file" {
-    source = "etc/"
-    dest = "/lib/systemd/system"
+    source = "../etc"
+    destination = "/home/ubuntu/etc"
   }
 
   provisioner "remote-exec" {
     inline = [
       "whoami",
+      # move the files uploaded above, unless we can copy directly
+      "chmod 755 /home/ubuntu/bin/*",
+      "sudo mv /home/ubuntu/bin/* /usr/local/bin",
+      "sudo mv /home/ubuntu/etc/* /lib/systemd/system",
       "sudo systemctl enable mycoind",
       "sudo systemctl enable tendermint",
       "tendermint init --home /home/ubuntu/.mycoind"
