@@ -1,3 +1,12 @@
+data "aws_ami" "node" {
+  most_recent = true
+  owners = ["self"]
+  filter {
+    name = "name"
+    values = ["${var.ami_name}"]
+  }
+}
+
 # Create a subnet to launch our instances into
 resource "aws_subnet" "node" {
   vpc_id                  = "${aws_vpc.default.id}"
@@ -48,7 +57,7 @@ resource "aws_instance" "node" {
   }
 
   instance_type = "${var.instance_type}"
-  ami = "${var.ami_id}"
+  ami = "${data.aws_ami.node.id}"
 
   # The name of our SSH keypair we created above.
   key_name = "${var.key_id}"
@@ -61,41 +70,21 @@ resource "aws_instance" "node" {
 
   subnet_id = "${aws_subnet.node.id}"
 
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
-
-  # make sure everything is up and running...
-  provisioner "local-exec" {
-    command = "sleep 30"
-  }
-
-  # i assume this runs without root permissions????
-  provisioner "file" {
-    source = "../bin"
-    destination = "/home/ubuntu/bin"
-  }
-
-  provisioner "file" {
-    source = "../etc"
-    destination = "/home/ubuntu/etc"
-  }
-
   provisioner "remote-exec" {
     inline = [
-      "whoami",
-      # move the files uploaded above, unless we can copy directly
-      "chmod 755 /home/ubuntu/bin/*",
-      "sudo mv /home/ubuntu/bin/* /usr/local/bin",
-      "sudo mv /home/ubuntu/etc/* /lib/systemd/system",
+      "tendermint init --home /home/ubuntu/.mycoind",
       "sudo systemctl enable mycoind",
-      "sudo systemctl enable tendermint",
-      "tendermint init --home /home/ubuntu/.mycoind"
+      "sudo systemctl enable tendermint"
     ]
+  }
 
-    # mycoind init TOKE admin-address-here
-    # sudo service tendermint start
-    # sudo service mycoind start
+  # this is optional, to start a one-node system
+  provisioner "remote-exec" {
+    inline = [
+      "mycoind init ${var.token} ${var.owner}",
+      "sudo service tendermint start",
+      "sudo service mycoind start"
+    ]
   }
 
   tags {

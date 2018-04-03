@@ -1,0 +1,41 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "aws_region": "eu-west-1",
+    "source_ami": "ami-a13266d8",
+    "ami_name": "",
+    "instance_class": "t2.small"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "{{user `aws_region`}}",
+    "source_ami": "{{user `source_ami`}}",
+    "instance_type": "{{user `instance_class`}}",
+    "ssh_username": "ubuntu",
+    "ami_name": "{{user `ami_name`}}",
+
+    "shutdown_behavior": "terminate",
+    "force_deregister": false,
+    "aws_regions": []
+  }],
+  "provisioners": [{
+    "pause_before": "20s",
+    "type": "file",
+    "source": "./files.zip",
+    "destination": "/home/ubuntu/files.zip"
+  }, {
+    "type": "shell",
+    "inline": [
+      "sudo apt-get update",
+      "sudo apt-get -y upgrade",
+      "sudo apt-get -y install zip unzip",
+      "unzip files.zip",
+      "chmod 755 bin/*",
+      "sudo mv bin/* /usr/local/bin",
+      "sudo mv etc/* /lib/systemd/system"
+    ]
+  }]
+}

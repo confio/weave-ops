@@ -7,3 +7,4 @@
 
 # Don't store compiled code
 bin/*
+*.zip

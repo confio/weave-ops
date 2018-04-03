@@ -8,9 +8,8 @@ variable "instance_type" {
   default = "t2.small"
 }
 
-variable "ami_id" {
-  description = "id of the ami to load - default ubuntu 16.04"
-  default = "ami-a13266d8"
+variable "ami_name" {
+  description = "the name of the ami to use for the web server"
 }
 
 variable "name" {
@@ -28,3 +27,11 @@ variable "key_id" {
   default = "terraform"
 }
 
+variable "token" {
+  description = "Token ID to place in genesis file"
+  default = "CASH"
+}
+
+variable "owner" {
+  description = "Address to hold the cash"
+}
